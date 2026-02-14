@@ -120,6 +120,25 @@ function crc16(payload){
  return (crc&0xFFFF).toString(16).toUpperCase().padStart(4,"0");
 }
 
+const inputValor = document.getElementById("valor");
+
+inputValor.addEventListener("input", (e) => {
+  let valor = e.target.value;
+
+  // Remove tudo que não é número
+  valor = valor.replace(/\D/g, "");
+
+  // Transforma em número e divide por 100 para ter centavos
+  valor = (valor / 100).toFixed(2);
+
+  // Formata como moeda BR
+  e.target.value = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).format(valor);
+});
+
+  
 function gerar(){
 
  let valorInput=document.getElementById("valor").value;
