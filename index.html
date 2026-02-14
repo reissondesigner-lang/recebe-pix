@@ -58,6 +58,7 @@ button{
   color:white;
   font-size:18px;
   cursor:pointer;
+  font-weight: bold;
 }
 
 #qrcode {display: flex; justify-content: center; margin-top: 20px; }
@@ -79,7 +80,7 @@ textarea{
 
 <body>
 
-<header>💸 Pix RD Flex</header>
+<header>🏦 Pix RD Flex</header>
 
 <div class="container">
 
@@ -87,9 +88,9 @@ textarea{
 
 <h3 style="text-align:center">Digite o valor</h3>
 
-<input id="valor" placeholder="R$ 0,00" type="text" inputmode="numeric">
+<input id="valor" placeholder="R$ 0,00" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false">
 
-<button onclick="gerar()">GERAR COBRANÇA</button>
+<button onclick="gerar()">GERAR PIX</button>
 
 <div id="qrcode"></div>
 
@@ -142,7 +143,9 @@ inputValor.addEventListener("input", (e) => {
 function gerar(){
 
  let valorInput=document.getElementById("valor").value;
-
+valorInput = valorInput.replace(/\D/g, ""); // remove tudo que não é número
+valorInput = (parseInt(valorInput)/100).toFixed(2);
+  
  if(!valorInput){
    alert("Digite o valor!");
    return;
