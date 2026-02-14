@@ -1,10 +1,10 @@
 {
-  "name": "Gerador Pix Dinâmico",
-  "short_name": "Pix",
+  "name": "Pix RDFlex",
+  "short_name": "Pix RDFlex",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#22c55e",
+  "background_color": "#122841",
+  "theme_color": "#136b2b",
   "orientation": "portrait",
   "icons": [
     {
