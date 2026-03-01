@@ -1,4 +1,4 @@
-const CACHE_NAME = "pix-pwa-v1";
+const CACHE_NAME = "pix-pwa-v2";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
