@@ -31,19 +31,36 @@ header{
 .container{padding:20px;max-width:520px;margin:auto}
 
 .card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:14px;
+  background:white;
+  color:#0f172a;
+  padding:28px 22px;
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.title{
+  text-align:center;
+  margin:0;
+  font-size:22px;
+  color:#136b2b;
+}
+
+.subtitle{
+  text-align:center;
+  margin:6px 0 22px;
+  font-size:14px;
+  opacity:.7;
 }
 
 input{
   width: calc(100% - 28px);
   padding:14px;
   margin:10px 0;
-  border:none;
+  border: 2px solid #ddd;
   border-radius:8px;
-  background:#0f172a;
-  color:white;
+  background:#f1f5f9;
+  color:#0f172a;
+  font-weight:bold;
   font-size:18px;
   text-align:center;
 }
@@ -59,18 +76,39 @@ button{
   font-size:18px;
   cursor:pointer;
   font-weight: bold;
+  transition:all .2s ease;
 }
 
-#qrcode {display: flex; justify-content: center; margin-top: 20px; }
+button:active{
+  transform:scale(.97);
+}
 
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+#qrcode{
+  display:flex;
+  justify-content:center;
+  margin:30px 0 10px;
+  opacity:0;
+  transform:scale(.9);
+  transition:.3s ease;
+}
+
+#qrcode.show{
+  opacity:1;
+  transform:scale(1);
+}
 
 textarea{
   width: calc(100% - 24px);
   height:110px;
   margin-top:15px;
-  background:#0f172a;
-  color:white;
-  border:none;
+  background:#f1f5f9;
+  color:#0f172a;
+  border:2px solid #ddd;
   border-radius:8px;
   padding:12px;
   resize: none;
@@ -86,17 +124,23 @@ textarea{
 
 <div class="card">
 
-<h3 style="text-align:center">Digite o valor</h3>
+<h2 class="title">Receber via Pix</h2>
+<p class="subtitle">Digite o valor da cobrança</p>
 
-<input id="valor" placeholder="R$ 0,00" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false">
+<input id="valor" placeholder="R$ 0,00" type="text"
+inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false">
 
-<button onclick="gerar()">GERAR PIX</button>
+<button id="btnGerar" onclick="gerar()" disabled>
+💰 GERAR PIX
+</button>
 
 <div id="qrcode"></div>
 
 <textarea id="resultado" readonly></textarea>
 
-<button onclick="copiar()">COPIAR PIX</button>
+<button id="btnCopiar" onclick="copiar()">
+📋 COPIAR PIX
+</button>
 
 </div>
 
@@ -124,32 +168,37 @@ function crc16(payload){
 const inputValor = document.getElementById("valor");
 
 inputValor.addEventListener("input", (e) => {
-  let valor = e.target.value;
 
-  // Remove tudo que não é número
-  valor = valor.replace(/\D/g, "");
+  let valor = e.target.value.replace(/\D/g, "");
 
-  // Transforma em número e divide por 100 para ter centavos
-  valor = (valor / 100).toFixed(2);
+  let numero = parseInt(valor || 0) / 100;
 
-  // Formata como moeda BR
+  document.getElementById("btnGerar").disabled = !(numero > 0.01);
+
+  valor = (numero).toFixed(2);
+
   e.target.value = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL"
   }).format(valor);
+
 });
 
+inputValor.addEventListener("keypress",e=>{
+ if(e.key==="Enter" && !document.getElementById("btnGerar").disabled){
+   gerar();
+ }
+});
   
 function gerar(){
-
+if(navigator.vibrate) navigator.vibrate(30);
  let valorInput=document.getElementById("valor").value;
 valorInput = valorInput.replace(/\D/g, ""); // remove tudo que não é número
-valorInput = (parseInt(valorInput)/100).toFixed(2);
+valorInput = (parseInt(valorInput || 0)/100).toFixed(2);
   
- if(!valorInput){
-   alert("Digite o valor!");
+ if(parseFloat(valorInput) <= 0.01){
    return;
- }
+}
 
  let valor=emv("54",parseFloat(valorInput).toFixed(2));
 
@@ -177,20 +226,30 @@ valorInput = (parseInt(valorInput)/100).toFixed(2);
  document.getElementById("resultado").value=payload;
 
  gerarQR(payload);
+document.getElementById("qrcode").scrollIntoView({behavior:"smooth"});
 }
 
 function gerarQR(texto){
- document.getElementById("qrcode").innerHTML="";
- new QRCode(document.getElementById("qrcode"),{
+ const qr = document.getElementById("qrcode");
+ qr.classList.remove("show");
+ qr.innerHTML="";
+ 
+ new QRCode(qr,{
   text:texto,width:220,height:220
  });
+
+ setTimeout(()=>qr.classList.add("show"),50);
 }
 
 function copiar(){
+ if(navigator.vibrate) navigator.vibrate(30);
+
  let campo=document.getElementById("resultado");
- campo.select();
- document.execCommand("copy");
- alert("Pix copiado!");
+ navigator.clipboard.writeText(campo.value);
+
+ let btn=document.getElementById("btnCopiar");
+ btn.innerText="✅ COPIADO!";
+ setTimeout(()=>btn.innerText="📋 COPIAR PIX",1500);
 }
 
 if("serviceWorker" in navigator){
