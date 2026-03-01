@@ -10,7 +10,8 @@
 <meta name="theme-color" content="#136b2b">
 
 <script src="qrcode.min.js"></script>
-
+<script src="config.js"></script>
+  
 <style>
 
 body{
@@ -148,9 +149,7 @@ inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false">
 
 <script>
 // DADOS DA SUA CONTA
-const CHAVE="cbd7ea13-743d-483e-bacb-18d459ea9d18";
-const NOME="REISSON DOS S E SANTOS";
-const CIDADE="SANTO ANTONIO";
+const {chave:CHAVE,nome:NOME,cidade:CIDADE}=window.APP_CONFIG;
 
 function emv(id,value){return id+value.length.toString().padStart(2,"0")+value;}
 
